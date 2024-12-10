@@ -1,5 +1,6 @@
 import { BiHash, BiHomeCircle, BiUser } from "react-icons/bi";
 import { BsBell, BsBookmark, BsEnvelope, BsTwitterX } from "react-icons/bs";
+import FeedCard from "./components/FeedCard";
 
 interface TwitterSidebarButton {
   title: string;
@@ -37,11 +38,11 @@ export default function Home() {
   return (
     <div>
       <div className="grid h-screen w-screen grid-cols-12 px-48">
-        <div className="col-span-3 justify-start px-4 pt-8">
+        <div className="col-span-3 ml-28 justify-start px-4 pt-2">
           <div className="h-fit w-fit cursor-pointer rounded-full p-3 text-2xl transition-all hover:bg-gray-800">
             <BsTwitterX />
           </div>
-          <div className="mt-4 text-xl font-medium">
+          <div className="mt-2 text-xl font-medium">
             <ul>
               {sidebarMenuItems.map((item, index) => (
                 <li
@@ -58,7 +59,21 @@ export default function Home() {
             </button>
           </div>
         </div>
-        <div className="col-span-6 border-l-[1px] border-r-[1px] border-slate-500"></div>
+        <div className="col-span-5 h-screen overflow-y-scroll border border-gray-800">
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+        </div>
         <div className="col-span-3"></div>
       </div>
     </div>

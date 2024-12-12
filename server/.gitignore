@@ -1,3 +1,25 @@
+# Node.js
 node_modules/
-.env
+*.log
+
+# Package Managers
+package-lock.json
+yarn.lock
+
+# Environment Files
+.env*
+!.env.example
+
+# Prisma
+prisma/migration_lock.toml
+
+
+# Build Artifacts
 dist/
+out/
+
+# Editor/OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

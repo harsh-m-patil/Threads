@@ -2,22 +2,30 @@ import express from "express";
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
 import bodyParser from "body-parser"; // Needed for handling POST requests
+import { prismaClient } from "../clients/db";
+
+import { User } from "./user";
+import cors from "cors";
 
 export async function initServer() {
   const app = express();
   app.use(bodyParser.json());
+  app.use(cors());
 
   // Define GraphQL schema
+  // NOTE: ! means required
   const typeDefs = `
+    ${User.types}
+
     type Query {
-      sayHello: String
+      ${User.queries}
     }
   `;
 
   // Define resolvers
   const resolvers = {
     Query: {
-      sayHello: () => "Hello World",
+      ...User.resolvers.queries,
     },
   };
 

@@ -1,6 +1,12 @@
+"use client";
 import { BiHash, BiHomeCircle, BiUser } from "react-icons/bi";
 import { BsBell, BsBookmark, BsEnvelope, BsTwitterX } from "react-icons/bs";
+import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import FeedCard from "./components/FeedCard";
+import { useCallback } from "react";
+import toast from "react-hot-toast";
+import { graphQLClient } from "@/clients/api";
+import { verifyUserGoogleTokenQuery } from "@/graphql/query/user";
 
 interface TwitterSidebarButton {
   title: string;
@@ -35,6 +41,27 @@ const sidebarMenuItems: TwitterSidebarButton[] = [
 ];
 
 export default function Home() {
+  const handleLoginWithGoogle = useCallback(
+    async (cred: CredentialResponse) => {
+      const googleToken = cred.credential;
+      if (!googleToken) return toast.error(`Google Token not found`);
+
+      const { verifyGoogleToken } = await graphQLClient.request(
+        verifyUserGoogleTokenQuery,
+        {
+          token: googleToken,
+        },
+      );
+
+      toast.success("Verified Success");
+
+      if (verifyGoogleToken) {
+        window.localStorage.setItem("__threads_token", verifyGoogleToken);
+      }
+    },
+    [],
+  );
+
   return (
     <div>
       <div className="grid h-screen w-screen grid-cols-12 px-48">
@@ -74,7 +101,12 @@ export default function Home() {
           <FeedCard />
           <FeedCard />
         </div>
-        <div className="col-span-3"></div>
+        <div className="col-span-3 p-5">
+          <div className="rounded-lg bg-slate-700 p-5">
+            <h1 className="my-2 text-2xl">New to Threads?</h1>
+            <GoogleLogin onSuccess={handleLoginWithGoogle} />
+          </div>
+        </div>
       </div>
     </div>
   );

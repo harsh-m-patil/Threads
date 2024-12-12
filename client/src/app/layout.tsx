@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -23,12 +25,23 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const clientId =
+    process.env.NEXT_PUBLIC_GCP_OAUTH_CLIENT_ID || "fallback-client-id";
+
+  if (!clientId || clientId === "fallback-client-id") {
+    console.warn(
+      "Using fallback Google OAuth Client ID. Please set NEXT_PUBLIC_GCP_OAUTH_CLIENT_ID in your environment.",
+    );
+  }
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <GoogleOAuthProvider clientId={clientId}>
+          {children}
+          <Toaster />
+        </GoogleOAuthProvider>
       </body>
     </html>
   );

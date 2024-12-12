@@ -1,6 +1,7 @@
 import axios from "axios";
 import { prismaClient } from "../../clients/db";
 import JWTService from "../../services/jwt";
+import { GraphQLContext } from "../../interfaces";
 
 interface GoogleTokenResult {
   iss?: string; // Issuer of the token
@@ -35,8 +36,6 @@ const queries = {
       },
     );
 
-    console.log(data);
-
     // Check if user exists
     const user = await prismaClient.user.findUnique({
       where: { email: data.email },
@@ -68,6 +67,14 @@ const queries = {
     const userToken = JWTService.generateTokenForUser(userInDb);
 
     return userToken;
+  },
+
+  getCurrentUser: async (parent: any, args: any, ctx: GraphQLContext) => {
+    const id = ctx.user?.id;
+    if (!id) return null;
+
+    const user = await prismaClient.user.findUnique({ where: { id: id } });
+    return user;
   },
 };
 

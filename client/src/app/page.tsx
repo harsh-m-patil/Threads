@@ -7,6 +7,9 @@ import { useCallback } from "react";
 import toast from "react-hot-toast";
 import { graphQLClient } from "@/clients/api";
 import { verifyUserGoogleTokenQuery } from "@/graphql/query/user";
+import { useCurrentUser } from "@/hooks/user";
+import { useQueryClient } from "@tanstack/react-query";
+import Image from "next/image";
 
 interface TwitterSidebarButton {
   title: string;
@@ -41,6 +44,9 @@ const sidebarMenuItems: TwitterSidebarButton[] = [
 ];
 
 export default function Home() {
+  const { user } = useCurrentUser();
+  const queryClient = useQueryClient();
+
   const handleLoginWithGoogle = useCallback(
     async (cred: CredentialResponse) => {
       const googleToken = cred.credential;
@@ -57,9 +63,11 @@ export default function Home() {
 
       if (verifyGoogleToken) {
         window.localStorage.setItem("__threads_token", verifyGoogleToken);
+        // NOTE: Invalidate and make the request again
+        await queryClient.invalidateQueries(["current-user"]);
       }
     },
-    [],
+    [queryClient],
   );
 
   return (
@@ -85,6 +93,20 @@ export default function Home() {
               Post
             </button>
           </div>
+          <div className="absolute bottom-5">
+            {user && (
+              <div className="mt-5 flex w-fit items-center gap-3 rounded-2xl bg-slate-900 px-7 py-2">
+                <Image
+                  className="rounded-full"
+                  src={user.profileImageURL}
+                  alt={user.firstName}
+                  width="50"
+                  height="50"
+                />
+                <span>{user.firstName}</span>
+              </div>
+            )}
+          </div>
         </div>
         <div className="col-span-5 h-screen overflow-y-scroll border border-gray-800">
           <FeedCard />
@@ -102,10 +124,12 @@ export default function Home() {
           <FeedCard />
         </div>
         <div className="col-span-3 p-5">
-          <div className="rounded-lg bg-slate-700 p-5">
-            <h1 className="my-2 text-2xl">New to Threads?</h1>
-            <GoogleLogin onSuccess={handleLoginWithGoogle} />
-          </div>
+          {!user && (
+            <div className="rounded-lg bg-slate-700 p-5">
+              <h1 className="my-2 text-2xl">New to Threads?</h1>
+              <GoogleLogin onSuccess={handleLoginWithGoogle} />
+            </div>
+          )}
         </div>
       </div>
     </div>
